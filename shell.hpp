@@ -24,7 +24,7 @@ typedef const char* CString;
 
 typedef enum shellCommand
 {
-    DOS_UNKNOWN_UNIX_UNKNOWN,
+    DOS_UNIX_PASSTHROUGH,
     DOS_CD_UNIX_CD,
     DOS_CD_UNIX_PWD,
     DOS_DIR_UNIX_LS,
@@ -42,7 +42,7 @@ typedef class shell
 
     protected:
 
-        static CString      translateDosToUnix(string dosString);
+        static bool         translateDosToUnix(string* dosString);
         static ShellCommand resolveDosCommand(string dosCommand);
 
     private:

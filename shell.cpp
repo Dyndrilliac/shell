@@ -9,29 +9,35 @@
 
 void Shell::execute(void)
 {
-    string input;
-
-    cout << "Type Ctrl-C to exit." << endl << endl;
+    cout << "Press Ctrl+C or type \"exit\" to quit." << endl << endl;
 
     do
     {
+        string input;
+
         cout << "> ";
 
         getline(cin, input);
 
         if (!input.empty())
         {
-            transform(input.begin(), input.end(), input.begin(), ::tolower);
-            system(Shell::translateDosToUnix(input));
+            if (Shell::translateDosToUnix(&input))
+            {
+                system(input.c_str());
+            }
+            else
+            {
+                cout << input << endl;
+            }
         }
     }
     while (true);
 }
 
-CString Shell::translateDosToUnix(string dosString)
+bool Shell::translateDosToUnix(string* dosString)
 {
-    string          retVal  = dosString;
-    vector<string>  args    = StringSplitter::splitString(retVal, ' ');
+    string*         retVal  = dosString;
+    vector<string>  args    = StringSplitter::splitString(*retVal, ' ');
 
     if (!args.empty())
     {
@@ -43,7 +49,7 @@ CString Shell::translateDosToUnix(string dosString)
             case DOS_CD_UNIX_CD:
                 if (args.size() > 1)
                 {
-                    chdir(retVal.substr(3).c_str());
+                    chdir(retVal->substr(3).c_str());
                     break;
                 }
                 else if (args.size() == 1)
@@ -51,39 +57,57 @@ CString Shell::translateDosToUnix(string dosString)
                     sc = DOS_CD_UNIX_PWD;
                     char* s;
                     getwd(s);
-                    return (const char*)s;
+
+                    if (s == NULL)
+                    {
+                        *retVal = "ERROR: Failed to get current working directory!";
+                        exit(EXIT_FAILURE);
+                    }
+                    else
+                    {
+                        *retVal = string(s);
+                    }
+
+                    return false;
                 }
 
             case DOS_DIR_UNIX_LS:
-                retVal.replace(0, 3, "ls");
+                retVal->replace(0, 3, "ls");
                 break;
 
             case DOS_TYPE_UNIX_CAT:
-                retVal.replace(0, 4, "cat");
+                retVal->replace(0, 4, "cat");
                 break;
 
             case DOS_DEL_UNIX_RM:
-                retVal.replace(0, 3, "rm");
+                retVal->replace(0, 3, "rm");
                 break;
 
             case DOS_REN_UNIX_MV:
-                retVal.replace(0, 3, "mv");
+                retVal->replace(0, 3, "mv");
                 break;
 
             case DOS_COPY_UNIX_CP:
-                retVal.replace(0, 4, "cp");
+                retVal->replace(0, 4, "cp");
                 break;
 
-            default:
+            default: // Implicitly DOS_UNIX_PASSTHROUGH
                 break;
         }
     }
 
-    return retVal.c_str();
+    return true;
 }
 
 ShellCommand Shell::resolveDosCommand(string dosCommand)
 {
+    transform(dosCommand.begin(), dosCommand.end(), dosCommand.begin(), ::tolower);
+
+    if (dosCommand.compare("exit") == 0)
+    {
+        exit(EXIT_SUCCESS);
+    }
+
     if (dosCommand.compare("cd") == 0)
     {
         return DOS_CD_UNIX_CD;
@@ -114,5 +138,5 @@ ShellCommand Shell::resolveDosCommand(string dosCommand)
         return DOS_COPY_UNIX_CP;
     }
 
-    return DOS_UNKNOWN_UNIX_UNKNOWN;
+    return DOS_UNIX_PASSTHROUGH;
 }
