@@ -61,7 +61,6 @@ bool Shell::translateDosToUnix(string* dosString)
                     if (s == NULL)
                     {
                         *retVal = "ERROR: Failed to get current working directory!";
-                        exit(EXIT_FAILURE);
                     }
                     else
                     {
