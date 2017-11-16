@@ -33,7 +33,7 @@ Support:
 
 # Execution
 
-* make exec
+* make execute
 
 # Clean Up
 
