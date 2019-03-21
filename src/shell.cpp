@@ -55,8 +55,8 @@ bool Shell::translateDosToUnix(string* dosString)
                 else if (args.size() == 1)
                 {
                     sc = DOS_CD_UNIX_PWD;
-                    char* s;
-                    getwd(s);
+                    char* s = new char[256];
+                    getcwd(s, 256);
 
                     if (s == NULL)
                     {
@@ -67,6 +67,7 @@ bool Shell::translateDosToUnix(string* dosString)
                         *retVal = string(s);
                     }
 
+                    delete s;
                     return false;
                 }
 

@@ -1,17 +1,20 @@
-shell.exe: stringSplitter.o shell.o main.o
-	g++ -o shell.exe stringSplitter.o shell.o main.o
+./bin/shell.out: ./src/stringSplitter.o ./src/shell.o ./src/main.o
+	g++ -o ./bin/shell.out ./src/stringSplitter.o ./src/shell.o ./src/main.o
 
-stringSplitter.o:
-	g++ -c -w stringSplitter.hpp shell.hpp main.hpp stringSplitter.cpp
+./src/stringSplitter.o:
+	g++ -c -w ./src/stringSplitter.hpp ./src/shell.hpp ./src/main.hpp ./src/stringSplitter.cpp
+	mv stringSplitter.o ./src/
 
-shell.o:
-	g++ -c -w stringSplitter.hpp shell.hpp main.hpp shell.cpp
+./src/shell.o:
+	g++ -c -w ./src/stringSplitter.hpp ./src/shell.hpp ./src/main.hpp ./src/shell.cpp
+	mv shell.o ./src/
 
-main.o:
-	g++ -c -w stringSplitter.hpp shell.hpp main.hpp main.cpp
+./src/main.o:
+	g++ -c -w ./src/stringSplitter.hpp ./src/shell.hpp ./src/main.hpp ./src/main.cpp
+	mv main.o ./src/
 
 clean:
-	rm -rf *.exe *.gch *.o
+	rm -rf ./bin/shell.out ./src/*.gch ./src/*.o
 
-execute: shell.exe
-	./shell.exe
+execute: ./bin/shell.out
+	./bin/shell.out
